@@ -1,0 +1,13 @@
+%h1 Dev links
+
+%p
+  == <a href="/links/new">Proposer un lien</a>
+
+- if @links.empty?
+  %p
+    Pas encore de liens...
+- else
+  %ul
+    - @links.each do |link|
+      %li
+        == <a href="#{link.url}">#{link.description}</a> (Score : #{link.score})

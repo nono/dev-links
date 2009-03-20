@@ -1,0 +1,16 @@
+%h1 Poster un lien
+
+- if !@link.new_record? && !@link.valid?
+  %ul{:class => 'error'}
+    - @link.errors.each do |error|
+      %li= error
+
+%form{:method => 'post', :action => '/links'}
+  %p
+    %label{:for => 'url'} URL :
+    %input{:type => 'text', :id => 'url', :name => 'url', :value => @link.url}
+  %p
+    %label{:for => 'description'} Description :
+    %textarea{:id => 'description', :name => 'description'}= @link.description
+  %p
+    %input{:type => 'submit', :value => 'Envoyer'}
