@@ -2,7 +2,10 @@
   == Lien n°#{@link.id}
 
 %p
-  == <a href="#{@link.url}">#{@link.description}</a> (Score : #{@link.score})
+  == <a href="#{@link.url}">#{@link.description}</a>
+
+%p
+  == Score : #{@link.score} <a href="/links/#{@link.id}/plus">+</a> <a href="/links/#{@link.id}/minus">-</a>
 
 %p
   == <a href="/">Retour à l'accueil</a>

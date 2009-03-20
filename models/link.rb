@@ -23,7 +23,8 @@ class Link
     $redis[attr_key :url]         = @url
     $redis[attr_key :description] = @description
     $redis[attr_key :score]       = @score
-    # TODO $redis["links:#{@id}:created_at"]  = DateTime.now
+    $redis[attr_key :created_at]  = DateTime.now
+    $redis.push_head("links:list", @id)
     true
   end
 
@@ -38,8 +39,16 @@ class Link
     @errors.empty?
   end
 
-  def attr_key(attribute, id=nil)
-    "links:#{id || @id}:#{attribute}"
+  def score_plus
+    @score = $redis.incr(attr_key :score)
+  end
+
+  def score_minus
+    @score = $redis.decr(attr_key :score)
+  end
+
+  def attr_key(attribute)
+    "links:#{@id}:#{attribute}"
   end
 
   def load(id)
@@ -47,26 +56,25 @@ class Link
     @url         = $redis[attr_key :url]
     @description = $redis[attr_key :description]
     @score       = $redis[attr_key :score]
+    @created_at  = $redis[attr_key :created_at]
     self
   end
 
   def self.find(id)
-    raise RecordNotFound unless $redis.key?("links:#{id}:url") # TODO created_at
+    raise RecordNotFound unless $redis.key?("links:#{id}:created_at")
     Link.new.load(id)
   end
 
-  def self.all
-    keys = $redis.keys("links:*:url") # TODO created_at
-    keys.map do |key|
-      key = key.scan(/\d+/).first
-      Link.new.load(key)
-    end
+  def self.all(keys=nil)
+    keys ||= $redis.list_range("links:list", 0, -1)
+    keys.map { |id| Link.new.load(id) }
   end
 
   # Return the 20 more popular links
   def self.popular
-    # TODO
-    []
+    return [] unless $redis.key?('links:list')
+    keys = $redis.sort 'links:list', :by => 'links:*:score', :order => 'DESC', :limit => [0,20]
+    all(keys)
   end
 
   def self.next_id

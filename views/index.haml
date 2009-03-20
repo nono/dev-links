@@ -3,6 +3,8 @@
 %p
   == <a href="/links/new">Proposer un lien</a>
 
+%h2
+  = @title
 - if @links.empty?
   %p
     Pas encore de liens...
@@ -10,4 +12,5 @@
   %ul
     - @links.each do |link|
       %li
-        == <a href="#{link.url}">#{link.description}</a> (Score : #{link.score})
+        == <a href="#{link.url}">#{link.description}</a>
+        == (Score : #{link.score} <a href="/links/#{link.id}/plus">+</a> <a href="/links/#{link.id}/minus">-</a>)

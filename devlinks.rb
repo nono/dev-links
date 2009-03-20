@@ -11,6 +11,13 @@ require 'sinatra'
 require 'models/link'
 
 get '/' do
+  @title = 'Les liens les plus populaires'
+  @links = Link.popular
+  haml :index
+end
+
+get '/links' do
+  @title = 'Les liens les plus récents'
   @links = Link.all
   haml :index
 end
@@ -35,6 +42,26 @@ get '/links/:link_id' do
   begin
     @link = Link.find(params[:link_id])
     haml :show
+  rescue RecordNotFound
+    redirect '/'
+  end
+end
+
+get '/links/:link_id/plus' do
+  begin
+    @link = Link.find(params[:link_id])
+    @link.score_plus
+    redirect "/links/#{@link.id}"
+  rescue RecordNotFound
+    redirect '/'
+  end
+end
+
+get '/links/:link_id/minus' do
+  begin
+    @link = Link.find(params[:link_id])
+    @link.score_minus
+    redirect "/links/#{@link.id}"
   rescue RecordNotFound
     redirect '/'
   end
