@@ -11,7 +11,7 @@ require 'sinatra'
 require 'models/link'
 
 get '/' do
-  @links = Link.popular
+  @links = Link.all
   haml :index
 end
 
@@ -29,5 +29,14 @@ end
 get '/links/new' do
   @link = Link.new
   haml :new
+end
+
+get '/links/:link_id' do
+  begin
+    @link = Link.find(params[:link_id])
+    haml :show
+  rescue RecordNotFound
+    redirect '/'
+  end
 end
 
